@@ -16,28 +16,61 @@ def get_brand_name(car_name):
 cars_data['name'] = cars_data['name'].apply(get_brand_name)
 
 # Dropdown for Car brand
-st.selectbox("Select Car Brand", cars_data['name'].unique())
+name = st.selectbox("Select Car Brand", cars_data['name'].unique())
 
 # Slider for manufacture year:
-st.slider("Car Manufacture year", 1994,2024)
+year = st.slider("Car Manufacture year", 1994,2024)
 
 # Slider for kms driven:
-st.slider("Number of kms Driven", 11,200000)
+km_driven = st.slider("Number of kms Driven", 11,200000)
 
 # Dropdown for Fuel type
-st.selectbox("Select Fuel type", cars_data['fuel'].unique())
+fuel = st.selectbox("Select Fuel type", cars_data['fuel'].unique())
 
 # Dropdown for Seller type
-st.selectbox("Select seller type", cars_data['seller_type'].unique())
+seller_type = st.selectbox("Select seller type", cars_data['seller_type'].unique())
+
+# Dropdown for transmission
+transmission = st.selectbox("Select transmission type:", cars_data['transmission'].unique())
+
+# Dropdown for owner:
+owner = st.selectbox("Select ownership level",cars_data['owner'].unique())
 
 # Slider for car mileage
-st.slider("Car Mileage", 10, 40)
+mileage = st.slider("Car Mileage", 10, 40)
 
 # Slider for engine capacity
-st.slider("Engine Capacity",500,5000)
+engine = st.slider("Engine Capacity",500,5000)
 
 # Slider for engine power:
-st.slider("BHP",0,200)
+max_power = st.slider("BHP",0,200)
 
 # Number of seats
-st.slider("Seating capacity",5,10)
+seats = st.slider("Seating capacity",5,10)
+
+# Creating button:
+
+sample_values = [name, year, km_driven, fuel, seller_type, transmission, owner, mileage, engine, max_power, seats]
+
+columns_df = ['name', 'year', 'km_driven', 'fuel', 'seller_type', 'transmission', 'owner', 'mileage', 'engine', 'max_power', 'seats']
+
+
+
+if st.button("Predict Car Price"): # this if conditionn runs only if the button is clicked
+    input_data_model = pd.DataFrame([sample_values], columns = columns_df)
+    # st.write(input_data_model)
+
+    # we also have to fix the categorical columns
+    cols1 = ['name','fuel','seller_type', 'transmission', 'owner'] # I'm being lazy here, please manually hardcode this
+    for i in cols1:
+        input_data_model[i].replace(cars_data[i].unique(),
+                                    list(range(1, cars_data[i].nunique()+1)), 
+                                    inplace = True)
+    
+    # Predicting car price:
+    car_price = model.predict(input_data_model)
+    # car_price = round(car_price)
+    
+    # st.markdown(f"Car price is Rs.{car_price:,}.")
+    st.markdown("Car price is Rs.{}.".format(car_price))
+
